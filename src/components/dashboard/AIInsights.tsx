@@ -24,14 +24,11 @@ export function AIInsights() {
         setInsights("");
 
         try {
-            // Prepare a lightweight summary to send to API to avoid token limits
-            // We'll summarize basics here
+            // ... (keep summary logic same) ...
             const totalRows = data.length;
             const headers = Object.keys(data[0]).join(", ");
-            const sampleRows = JSON.stringify(data.slice(0, 10)); // Send first 10 rows as context
+            const sampleRows = JSON.stringify(data.slice(0, 10));
 
-            // Basic aggregation for context
-            // Note: In a real app, do more aggregation here before sending
             const summary = `
         Dataset Headers: ${headers}
         Total Rows: ${totalRows}
@@ -40,16 +37,28 @@ export function AIInsights() {
 
             const result = await generateInsights(summary);
             setInsights(result);
+            setLoading(false); // End main loading immediately after AI result
 
-            // Save to history automatically
+            // Save to history automatically in background
             if (user && result) {
                 setSaving(true);
-                await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, data);
+                try {
+                    const saveResult = await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, data);
+                    if (!saveResult.success) {
+                        console.error("Save failed:", saveResult.error);
+                    }
+                } catch (saveErr) {
+                    console.error("Background save crash:", saveErr);
+                } finally {
+                    setSaving(false);
+                }
             }
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Failed to generate insights. Please try again.");
+            setLoading(false);
         } finally {
+            // Ensure indicators are cleared
             setLoading(false);
             setSaving(false);
         }
