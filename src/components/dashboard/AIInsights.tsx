@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { useData } from "@/context/DataContext";
+import { useAuth } from "@/context/AuthContext";
 import { generateInsights } from "@/app/actions/gemini";
-import { Sparkles, Loader2 } from "lucide-react";
+import { saveAnalysis } from "@/app/actions/history";
+import { Sparkles, Loader2, CheckCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export function AIInsights() {
-    const { data } = useData();
-    const [insights, setInsights] = useState("");
+    const { data, fileName, insights, setInsights } = useData();
+    const { user } = useAuth();
+    // const [insights, setInsights] = useState(""); // Removed local state
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
     const handleGenerateInsights = async () => {
@@ -36,11 +40,18 @@ export function AIInsights() {
 
             const result = await generateInsights(summary);
             setInsights(result);
+
+            // Save to history automatically
+            if (user && result) {
+                setSaving(true);
+                await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, data);
+            }
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Failed to generate insights. Please try again.");
         } finally {
             setLoading(false);
+            setSaving(false);
         }
     };
 
@@ -64,6 +75,18 @@ export function AIInsights() {
                     >
                         Generate Insights
                     </button>
+                )}
+                {saving && (
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Saving to history...
+                    </div>
+                )}
+                {insights && !saving && (
+                    <div className="flex items-center gap-1 text-xs text-green-500">
+                        <CheckCircle className="h-3 w-3" />
+                        Saved to history
+                    </div>
                 )}
             </div>
 
