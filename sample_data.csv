@@ -1,0 +1,16 @@
+Date,Product,Category,Sales,Quantity,Region
+2024-01-01,Laptop Pro,Electronics,1200,5,North
+2024-01-02,Wireless Mouse,Accessories,25,50,South
+2024-01-03,Desk Chair,Furniture,150,12,East
+2024-01-04,Monitor 4K,Electronics,400,8,West
+2024-01-05,Laptop Stand,Accessories,45,20,North
+2024-01-06,Mechanical Keyboard,Electronics,120,15,South
+2024-01-07,USB-C Hub,Accessories,35,30,East
+2024-01-08,Ergonomic Mouse,Accessories,50,25,West
+2024-01-09,Gaming Headset,Electronics,80,10,North
+2024-01-10,Webcam HD,Electronics,60,18,South
+2024-01-11,Office Desk,Furniture,300,4,East
+2024-01-12,External SSD,Electronics,100,22,West
+2024-01-13,Bluetooth Speaker,Accessories,70,14,North
+2024-01-14,Tablet generic,Electronics,250,7,South
+2024-01-15,Phone Stand,Accessories,15,40,East
