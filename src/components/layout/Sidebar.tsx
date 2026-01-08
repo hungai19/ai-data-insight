@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { LayoutDashboard, History, CreditCard, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, current: true },
-  { name: "History", href: "/history", icon: History, current: false },
-  { name: "Billing", href: "/billing", icon: CreditCard, current: false },
-];
+import { usePathname } from "next/navigation";
 
 export function Sidebar() {
+  const pathname = usePathname();
+
+  const navigation = [
+    { name: "Dashboard", href: "/", icon: LayoutDashboard, current: pathname === "/" },
+    { name: "History", href: "/history", icon: History, current: pathname === "/history" },
+    { name: "Billing", href: "/billing", icon: CreditCard, current: pathname === "/billing" },
+  ];
+
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-zinc-950 text-white">
       <div className="flex h-16 items-center px-6">
@@ -34,9 +37,12 @@ export function Sidebar() {
             </Link>
           ))}
           <div className="mt-auto">
-             <Link
+            <Link
               href="/settings"
-              className="text-zinc-400 hover:bg-zinc-800 hover:text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-all duration-200"
+              className={cn(
+                pathname === "/settings" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                "group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-all duration-200"
+              )}
             >
               <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />
               Settings
