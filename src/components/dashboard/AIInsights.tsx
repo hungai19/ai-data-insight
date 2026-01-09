@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
-import { generateInsights } from "@/app/actions/gemini";
+import { generateInsights, getAnalysisSuggestions } from "@/app/actions/gemini";
 import { saveAnalysis } from "@/app/actions/history";
-import { Sparkles, Loader2, CheckCircle } from "lucide-react";
+import { Sparkles, Loader2, CheckCircle, Lightbulb } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export function AIInsights() {
@@ -14,8 +14,25 @@ export function AIInsights() {
     // const [insights, setInsights] = useState(""); // Removed local state
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [suggestions, setSuggestions] = useState("");
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [error, setError] = useState("");
 
+    const fetchSuggestions = async () => {
+        if (!data || data.length === 0 || insights) return;
+        setLoadingSuggestions(true);
+        try {
+            const headers = Object.keys(data[0]);
+            const result = await getAnalysisSuggestions(headers);
+            setSuggestions(result);
+        } catch (err) {
+            console.error("Failed to fetch suggestions:", err);
+        } finally {
+            setLoadingSuggestions(false);
+        }
+    };
+
+    // Use a trigger or effect if needed, but for now we'll just show it
     const handleGenerateInsights = async () => {
         if (!data || data.length === 0) return;
 
@@ -100,6 +117,32 @@ export function AIInsights() {
             </div>
 
             <div className="mt-4">
+                {!insights && !loading && (
+                    <div className="mb-6 rounded-lg bg-blue-50/50 p-4 dark:bg-blue-900/10">
+                        <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400">
+                            <Lightbulb className="h-4 w-4" />
+                            <h4 className="text-sm font-semibold">Gợi ý phân tích cho tập dữ liệu này:</h4>
+                        </div>
+                        {loadingSuggestions ? (
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Đang đề xuất...
+                            </div>
+                        ) : suggestions ? (
+                            <div className="prose prose-xs max-w-none text-gray-600 dark:text-gray-400 italic">
+                                <ReactMarkdown>{suggestions}</ReactMarkdown>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={fetchSuggestions}
+                                className="text-xs text-blue-600 hover:underline"
+                            >
+                                Nhấp để xem gợi ý phân tích
+                            </button>
+                        )}
+                    </div>
+                )}
+
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-purple-600" />

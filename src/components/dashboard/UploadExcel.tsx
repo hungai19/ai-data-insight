@@ -27,15 +27,24 @@ export function UploadExcel({ compact = false }: { compact?: boolean }) {
                     if (!binaryStr) throw new Error("Failed to read file");
 
                     const workbook = XLSX.read(binaryStr, { type: "binary" });
-                    const sheetName = workbook.SheetNames[0]; // Take the first sheet
-                    const sheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+                    const allSheetsData: Record<string, any[]> = {};
+                    const sheetNames = workbook.SheetNames;
 
-                    if (jsonData.length === 0) {
+                    sheetNames.forEach(name => {
+                        const sheet = workbook.Sheets[name];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        if (jsonData.length > 0) {
+                            allSheetsData[name] = jsonData;
+                        }
+                    });
+
+                    const validSheetNames = Object.keys(allSheetsData);
+
+                    if (validSheetNames.length === 0) {
                         setError("The uploaded file is empty or could not be parsed.");
                     } else {
-                        console.log("Parsed Data Preview:", jsonData.slice(0, 5));
-                        setParsedData(jsonData, file.name);
+                        console.log(`Parsed ${validSheetNames.length} sheets:`, validSheetNames);
+                        setParsedData(allSheetsData, validSheetNames, file.name);
                     }
                 } catch (err) {
                     console.error("Error parsing file:", err);

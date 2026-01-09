@@ -6,6 +6,7 @@ import { UploadExcel } from "@/components/dashboard/UploadExcel";
 import { DataPreview } from "@/components/dashboard/DataPreview";
 import { DataVisualization } from "@/components/dashboard/DataVisualization";
 import { AIInsights } from "@/components/dashboard/AIInsights";
+import { SheetSelector } from "@/components/dashboard/SheetSelector";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function Home() {
@@ -20,14 +21,16 @@ export default function Home() {
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-8">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-                  <p className="text-gray-500 dark:text-gray-400">Welcome back! Here's what's happening today.</p>
+                  <p className="text-gray-500 dark:text-gray-400">Chào mừng bạn trở lại! Hãy bắt đầu khám phá dữ liệu của bạn.</p>
                 </div>
                 <UploadExcel compact={true} />
               </div>
 
+              <SheetSelector />
               <DataVisualization />
               <AIInsights />
               <DataPreview />
+
               <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {/* Stats cards would go here */}
               </div>
