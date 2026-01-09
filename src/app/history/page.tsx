@@ -40,8 +40,23 @@ export default function HistoryPage() {
     }, [user]);
 
     const handleViewHistory = (item: any) => {
+        // Handle migration from old array format to new record format
+        let allData: Record<string, any[]> = {};
+        let sheetNamesList: string[] = [];
+
+        if (Array.isArray(item.dataPreview)) {
+            // Old format: dataPreview is an array of rows from a single sheet
+            const defaultSheetName = "Sheet1";
+            allData = { [defaultSheetName]: item.dataPreview };
+            sheetNamesList = [defaultSheetName];
+        } else if (item.dataPreview && typeof item.dataPreview === 'object') {
+            // New format: dataPreview is Record<string, any[]>
+            allData = item.dataPreview;
+            sheetNamesList = Object.keys(allData);
+        }
+
         // Set context data
-        setParsedData(item.dataPreview || [], item.fileName);
+        setParsedData(allData, sheetNamesList, item.fileName);
         setInsights(item.insights);
         // Redirect to dashboard
         router.push("/");

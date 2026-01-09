@@ -3,22 +3,29 @@
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "firebase/firestore";
 
-export async function saveAnalysis(userId: string, fileName: string, insights: string, data: any[]) {
+export async function saveAnalysis(userId: string, fileName: string, insights: string, allData: Record<string, any[]>) {
     try {
         if (!userId) throw new Error("User ID is required");
 
         // We store the full data if it's small, otherwise just a sample and summary
-        // For now, let's store a sample (first 50 rows) to keep doc size low
-        const sampleData = data.slice(0, 50);
+        // For multi-sheet support, we store a sample (first 50 rows) of each sheet
+        const dataPreview: Record<string, any[]> = {};
+        let totalRows = 0;
+
+        Object.entries(allData).forEach(([sheetName, sheetData]) => {
+            dataPreview[sheetName] = sheetData.slice(0, 50);
+            totalRows += sheetData.length;
+        });
 
         const historyRef = collection(db, "analysis_history");
         await addDoc(historyRef, {
             userId,
             fileName,
             insights,
-            dataPreview: sampleData,
-            totalRows: data.length,
+            dataPreview, // This is now a Record<string, any[]>
+            totalRows,
             createdAt: serverTimestamp(),
+            version: "2.0", // To distinguish from old array format
         });
 
         return { success: true };

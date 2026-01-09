@@ -9,7 +9,7 @@ import { Sparkles, Loader2, CheckCircle, Lightbulb } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export function AIInsights() {
-    const { data, fileName, insights, setInsights } = useData();
+    const { data, allData, fileName, insights, setInsights } = useData();
     const { user } = useAuth();
     // const [insights, setInsights] = useState(""); // Removed local state
     const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ export function AIInsights() {
             if (user && result) {
                 setSaving(true);
                 try {
-                    const saveResult = await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, data);
+                    const saveResult = await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, allData);
                     if (!saveResult.success) {
                         console.error("Save failed:", saveResult.error);
                     }
