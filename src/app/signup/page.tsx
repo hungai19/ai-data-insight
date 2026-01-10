@@ -48,10 +48,15 @@ export default function SignupPage() {
             await signInWithPopup(auth, googleProvider);
             router.push("/");
         } catch (err: any) {
-            console.error(err);
-            setError("Failed to sign up with Google.");
+            console.error("Google signup error:", err);
             if (err.code === 'auth/popup-closed-by-user') {
                 setError("Signup popup was closed before finishing.");
+            } else if (err.code === 'auth/operation-not-allowed') {
+                setError("Google sign-in is not enabled in Firebase Console.");
+            } else if (err.code === 'auth/unauthorized-domain') {
+                setError("This domain is not authorized for Google sign-in.");
+            } else {
+                setError(err.message || "Failed to sign up with Google.");
             }
         } finally {
             setLoading(false);
