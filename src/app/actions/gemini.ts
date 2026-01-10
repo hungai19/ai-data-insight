@@ -94,3 +94,53 @@ export async function analyzeChartData(chartInfo: { type: string, xAxis: string,
         throw new Error("Failed to analyze chart data.");
     }
 }
+
+export async function chatWithData(message: string, dataContext: string, history: any[] = []) {
+    if (!apiKey) {
+        throw new Error("API Key missing.");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    // Initial system instruction
+    const systemInstruction = `
+    Bạn là một chuyên gia phân tích dữ liệu chuyên nghiệp. Nhiệm vụ của bạn là trả lời các câu hỏi của người dùng dựa TRÊN DUY NHẤT dữ liệu được cung cấp dưới đây.
+    
+    Ngữ cảnh dữ liệu (Dữ liệu này là sheet hiện tại người dùng đang xem):
+    ${dataContext}
+    
+    Quy tắc:
+    1. Nếu dữ liệu không chứa thông tin để trả lời, hãy nói: "Tôi không tìm thấy thông tin này trong dữ liệu hiện tại."
+    2. Luôn trả lời bằng tiếng Việt, chuyên nghiệp, súc tích.
+    3. Định dạng câu trả lời đẹp bằng markdown (bôi đậm, bảng, danh sách) nếu cần thiết.
+    4. Nếu người dùng hỏi về các phép tính (tổng, trung bình...), hãy thực hiện tính toán dựa trên dữ liệu mẫu và tóm tắt được cung cấp.
+    5. Không bịa đặt thông tin không có trong dữ liệu.
+    `;
+
+    try {
+        const chat = model.startChat({
+            history: history.length > 0 ? history : [
+                {
+                    role: "user",
+                    parts: [{ text: "Hãy ghi nhớ ngữ cảnh dữ liệu tôi đã cung cấp và trả lời các câu hỏi tiếp theo của tôi." }],
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "Tôi đã hiểu. Tôi là chuyên gia phân tích dữ liệu của bạn. Hãy đặt câu hỏi về dữ liệu trên, tôi sẽ trả lời dựa trên những gì tôi thấy." }],
+                },
+            ],
+        });
+
+        const fullMessage = history.length === 0
+            ? `Ngữ cảnh hệ thống: ${systemInstruction}\n\nCâu hỏi của tôi: ${message}`
+            : message;
+
+        const result = await chat.sendMessage(fullMessage);
+        const response = await result.response;
+        return response.text();
+    } catch (error: any) {
+        console.error("Error in chatWithData:", error);
+        throw new Error("Failed to process chat message.");
+    }
+}
