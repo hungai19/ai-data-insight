@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Sidebar } from "@/components/layout/Sidebar";
