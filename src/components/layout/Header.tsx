@@ -1,12 +1,21 @@
-import { Bell, Search, User, LogOut } from "lucide-react";
+import { Bell, Search, User, LogOut, Menu } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { auth, isFirebaseInitialized } from "@/lib/firebase";
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
     const { user } = useAuth();
 
     return (
-        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white/50 px-6 backdrop-blur-md shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white/50 px-4 md:px-6 backdrop-blur-md shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+            <button
+                type="button"
+                className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+                onClick={onMenuClick}
+            >
+                <span className="sr-only">Open sidebar</span>
+                <Menu className="h-6 w-6" aria-hidden="true" />
+            </button>
+
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <form className="relative flex flex-1" action="#" method="GET">
                     <label htmlFor="search-field" className="sr-only">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/Header";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
@@ -17,6 +18,7 @@ export default function HistoryPage() {
     const [history, setHistory] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -66,8 +68,9 @@ export default function HistoryPage() {
         <ProtectedRoute>
             <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-black font-sans">
                 <Sidebar />
+                <MobileSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
                 <div className="flex flex-1 flex-col overflow-hidden">
-                    <Header />
+                    <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
                     <main className="flex-1 overflow-y-auto p-4 lg:p-8">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex items-center justify-between mb-8">

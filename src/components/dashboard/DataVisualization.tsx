@@ -238,24 +238,24 @@ export function DataVisualization() {
                     {/* Chart Type Selector */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Loại biểu đồ</label>
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <button
                                 onClick={() => setChartType("bar")}
-                                className={`flex flex-1 items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "bar" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
+                                className={`flex items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "bar" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
                             >
-                                <BarChart3 className="h-4 w-4" /> Bar
+                                <BarChart3 className="h-4 w-4 shrink-0" /> <span className="truncate">Bar</span>
                             </button>
                             <button
                                 onClick={() => setChartType("line")}
-                                className={`flex flex-1 items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "line" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
+                                className={`flex items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "line" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
                             >
-                                <LineChart className="h-4 w-4" /> Line
+                                <LineChart className="h-4 w-4 shrink-0" /> <span className="truncate">Line</span>
                             </button>
                             <button
                                 onClick={() => setChartType("pie")}
-                                className={`flex flex-1 items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "pie" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
+                                className={`flex items-center justify-center gap-2 rounded-md border p-2 text-sm transition-all ${chartType === "pie" ? "border-blue-600 bg-blue-50 text-blue-600" : "border-gray-200 hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"}`}
                             >
-                                <PieChart className="h-4 w-4" /> Pie
+                                <PieChart className="h-4 w-4 shrink-0" /> <span className="truncate">Pie</span>
                             </button>
                         </div>
                     </div>
@@ -290,12 +290,12 @@ export function DataVisualization() {
                 {/* Chart Display */}
                 <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900" id="chart-container">
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white capitalize">
                             {chartType} Chart: {yAxis} theo {xAxis}
                         </h3>
                     </div>
 
-                    <div className="relative min-h-[400px] w-full flex items-center justify-center">
+                    <div className="relative min-h-[300px] md:min-h-[400px] w-full flex items-center justify-center">
                         {processedData ? (
                             <>
                                 {chartType === "bar" && <Bar ref={chartRef} data={processedData} options={{ responsive: true, maintainAspectRatio: false }} />}

@@ -13,7 +13,7 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r bg-zinc-950 text-white">
+    <div className="hidden lg:flex h-screen w-64 flex-col border-r bg-zinc-950 text-white shrink-0">
       <div className="flex h-16 items-center px-6">
         <h1 className="text-xl font-bold tracking-tight text-blue-500">
           Data<span className="text-white">Insight</span>
