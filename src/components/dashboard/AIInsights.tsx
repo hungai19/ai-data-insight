@@ -5,7 +5,7 @@ import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
 import { generateInsights, getAnalysisSuggestions } from "@/app/actions/gemini";
 import { saveAnalysis } from "@/app/actions/history";
-import { Sparkles, Loader2, CheckCircle, Lightbulb } from "lucide-react";
+import { Sparkles, Loader2, CheckCircle, Lightbulb, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export function AIInsights() {
@@ -14,6 +14,8 @@ export function AIInsights() {
     // const [insights, setInsights] = useState(""); // Removed local state
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [saveError, setSaveError] = useState("");
     const [suggestions, setSuggestions] = useState("");
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [error, setError] = useState("");
@@ -36,9 +38,10 @@ export function AIInsights() {
     const handleGenerateInsights = async () => {
         if (!data || data.length === 0) return;
 
-        setLoading(true);
         setError("");
         setInsights("");
+        setSaveSuccess(false);
+        setSaveError("");
 
         try {
             // ... (keep summary logic same) ...
@@ -59,13 +62,17 @@ export function AIInsights() {
             // Save to history automatically in background
             if (user && result) {
                 setSaving(true);
+                setSaveError("");
                 try {
                     const saveResult = await saveAnalysis(user.uid, fileName || "unnamed_analysis", result, allData);
-                    if (!saveResult.success) {
-                        console.error("Save failed:", saveResult.error);
+                    if (saveResult.success) {
+                        setSaveSuccess(true);
+                    } else {
+                        setSaveError(saveResult.error || "Không thể lưu vào lịch sử");
                     }
-                } catch (saveErr) {
+                } catch (saveErr: any) {
                     console.error("Background save crash:", saveErr);
+                    setSaveError(saveErr.message || "Lỗi lưu trữ");
                 } finally {
                     setSaving(false);
                 }
@@ -105,13 +112,19 @@ export function AIInsights() {
                 {saving && (
                     <div className="flex items-center gap-2 text-xs text-gray-400">
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        Saving to history...
+                        Đang lưu...
                     </div>
                 )}
-                {insights && !saving && (
+                {saveSuccess && !saving && (
                     <div className="flex items-center gap-1 text-xs text-green-500">
                         <CheckCircle className="h-3 w-3" />
-                        Saved to history
+                        Đã lưu lịch sử
+                    </div>
+                )}
+                {saveError && !saving && (
+                    <div className="flex items-center gap-1 text-xs text-red-500">
+                        <X className="h-3 w-3" />
+                        Lỗi lưu: {saveError}
                     </div>
                 )}
             </div>

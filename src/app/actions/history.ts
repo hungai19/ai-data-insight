@@ -1,4 +1,4 @@
-"use server";
+// This file is now client-side compatible to ensure Firebase Auth context is available for Firestore operations.
 
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "firebase/firestore";
@@ -42,11 +42,11 @@ export async function getUserHistory(userId: string) {
         const historyRef = collection(db, "analysis_history");
         const q = query(
             historyRef,
-            where("userId", "==", userId),
-            orderBy("createdAt", "desc")
+            where("userId", "==", userId)
         );
 
         const querySnapshot = await getDocs(q);
+
         const history = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
