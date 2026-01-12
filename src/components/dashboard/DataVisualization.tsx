@@ -83,24 +83,46 @@ export function DataVisualization() {
         const labels = Object.keys(aggregated);
         const values = Object.values(aggregated);
 
+        // Modern Professional Color Palettes
         const colors = [
-            "rgba(59, 130, 246, 0.7)", "rgba(16, 185, 129, 0.7)",
-            "rgba(245, 158, 11, 0.7)", "rgba(239, 68, 68, 0.7)",
-            "rgba(139, 92, 246, 0.7)", "rgba(6, 182, 212, 0.7)",
-            "rgba(244, 63, 94, 0.7)", "rgba(249, 115, 22, 0.7)"
+            "rgba(99, 102, 241, 0.85)",  // Indigo
+            "rgba(14, 165, 233, 0.85)",  // Sky Blue
+            "rgba(168, 85, 247, 0.85)",  // Purple
+            "rgba(20, 184, 166, 0.85)",  // Teal
+            "rgba(236, 72, 153, 0.85)",  // Pink
+            "rgba(245, 158, 11, 0.85)",  // Amber
+            "rgba(34, 197, 94, 0.85)",   // Green
+            "rgba(239, 68, 68, 0.85)"    // Red
         ];
 
         return {
             labels,
             datasets: [
                 {
-                    label: `Tổng ${yAxis} theo ${xAxis}`,
+                    label: `Tổng ${yAxis}`,
                     data: values,
-                    backgroundColor: colors,
-                    borderColor: colors.map(c => c.replace("0.7", "1")),
-                    borderWidth: 1,
-                    tension: 0.3,
+                    backgroundColor: (context: any) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return colors[context.dataIndex % colors.length];
+
+                        // Create gradient for Bar/Line
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        const baseColor = colors[context.dataIndex % colors.length];
+                        gradient.addColorStop(0, baseColor.replace("0.85", "0.4"));
+                        gradient.addColorStop(1, baseColor);
+                        return gradient;
+                    },
+                    borderColor: colors.map(c => c.replace("0.85", "1")),
+                    borderWidth: 2,
+                    borderRadius: chartType === "bar" ? 8 : 0,
+                    tension: 0.4,
                     fill: chartType === "line",
+                    pointBackgroundColor: "#fff",
+                    pointBorderColor: colors[0].replace("0.85", "1"),
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                 },
             ],
         };
@@ -230,9 +252,9 @@ export function DataVisualization() {
     if (!data || data.length === 0) return null;
 
     return (
-        <div className="mt-8 space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Tùy chỉnh biểu đồ</h3>
+        <div className="mt-8 space-y-8">
+            <div className="glass-card p-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Tùy chỉnh biểu đồ</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Chart Type Selector */}
@@ -288,19 +310,80 @@ export function DataVisualization() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="chart-export-area">
                 {/* Chart Display */}
-                <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900" id="chart-container">
-                    <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white capitalize">
-                            {chartType} Chart: {yAxis} theo {xAxis}
-                        </h3>
+                <div className="lg:col-span-2 glass-card p-6" id="chart-container">
+                    <div className="mb-6 flex items-center justify-between">
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white capitalize">
+                                {chartType} Chart
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {yAxis} theo {xAxis}
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="relative min-h-[300px] md:min-h-[400px] w-full flex items-center justify-center">
+                    <div className="relative min-h-[350px] md:min-h-[450px] w-full flex items-center justify-center">
                         {processedData ? (
                             <>
-                                {chartType === "bar" && <Bar ref={chartRef} data={processedData} options={{ responsive: true, maintainAspectRatio: false }} />}
-                                {chartType === "line" && <Line ref={chartRef} data={processedData} options={{ responsive: true, maintainAspectRatio: false }} />}
-                                {chartType === "pie" && <Pie ref={chartRef} data={processedData} options={{ responsive: true, maintainAspectRatio: false }} />}
+                                {chartType === "bar" && (
+                                    <Bar
+                                        ref={chartRef}
+                                        data={processedData}
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: {
+                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                    padding: 12,
+                                                    cornerRadius: 8,
+                                                    titleFont: { size: 14, weight: "bold" },
+                                                    bodyFont: { size: 14 },
+                                                }
+                                            },
+                                            scales: {
+                                                y: { grid: { tickBorderDash: [5, 5] } },
+                                                x: { grid: { display: false } }
+                                            }
+                                        }}
+                                    />
+                                )}
+                                {chartType === "line" && (
+                                    <Line
+                                        ref={chartRef}
+                                        data={processedData}
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: {
+                                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                                    padding: 12,
+                                                    cornerRadius: 8,
+                                                }
+                                            },
+                                            scales: {
+                                                y: { grid: { tickBorderDash: [5, 5] } },
+                                                x: { grid: { display: false } }
+                                            }
+                                        }}
+                                    />
+                                )}
+                                {chartType === "pie" && (
+                                    <Pie
+                                        ref={chartRef}
+                                        data={processedData}
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: { position: "bottom" }
+                                            }
+                                        }}
+                                    />
+                                )}
                             </>
                         ) : (
                             <p className="text-gray-500">Đang chuẩn bị dữ liệu...</p>
@@ -309,7 +392,7 @@ export function DataVisualization() {
                 </div>
 
                 {/* AI Analysis Section */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 flex flex-col">
+                <div className="glass-card p-6 flex flex-col">
                     <div className="flex items-center gap-2 mb-4">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
                             <Sparkles className="h-5 w-5" />
